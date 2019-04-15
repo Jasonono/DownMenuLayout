@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DownMenuLayout">
+        <attr name="tab_item_padding" format="dimension"/>
+        <attr name="tab_item_textSize" format="dimension"/>
+        <attr name="tab_item_textColor" format="color"/>
+    </declare-styleable>
+</resources>
