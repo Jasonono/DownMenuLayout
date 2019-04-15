@@ -11,4 +11,7 @@ public abstract class BaseMenuAdapter {
 
     public abstract View getMenuView(int position,ViewGroup parent);
 
+    public abstract void menuClose(View tabView);
+
+    public abstract void menuOpen(View tabView);
 }

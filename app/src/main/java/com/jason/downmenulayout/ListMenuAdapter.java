@@ -1,6 +1,7 @@
 package com.jason.downmenulayout;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ public class ListMenuAdapter extends BaseMenuAdapter {
     public ListMenuAdapter (Context context){
         this.mContext = context;
     }
+
     @Override
     public int getCount() {
         return mItems.length;
@@ -33,5 +35,17 @@ public class ListMenuAdapter extends BaseMenuAdapter {
                 false);
         menuView.setText(mItems[position]);
         return menuView;
+    }
+
+    @Override
+    public void menuClose(View tabView) {
+        TextView textView = (TextView) tabView;
+        textView.setTextColor(ContextCompat.getColor(mContext,R.color.colorBlack));
+    }
+
+    @Override
+    public void menuOpen(View tabView) {
+        TextView textView = (TextView) tabView;
+        textView.setTextColor(ContextCompat.getColor(mContext,R.color.colorAccent));
     }
 }

@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -84,12 +86,14 @@ public class DownMenuLayout extends LinearLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        mMenuContainerHeight = (int) (height * 0.75f);
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mContainerView.getLayoutParams();
-        layoutParams.height = mMenuContainerHeight;
-        mContainerView.setLayoutParams(layoutParams);
-        mContainerView.setTranslationY(-mMenuContainerHeight);
+        if (mMenuContainerHeight==0){
+            int height = MeasureSpec.getSize(heightMeasureSpec);
+            mMenuContainerHeight = (int) (height * 0.75f);
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mContainerView.getLayoutParams();
+            layoutParams.height = mMenuContainerHeight;
+            mContainerView.setLayoutParams(layoutParams);
+            mContainerView.setTranslationY(-mMenuContainerHeight);
+        }
     }
 
     public void setAdapter(BaseMenuAdapter adapter) {
@@ -125,10 +129,25 @@ public class DownMenuLayout extends LinearLayout {
         tabView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (mCurrentTabPosition == -1) {
                     openMenu(position, tabView);
                 } else {
-                    closeMenu();
+                    if (position != mCurrentTabPosition) {
+                        //有menu 打开时 点击其他的tab 直接展示对应tab 的menu
+                        View menuView = mContainerView.getChildAt(position);
+                        menuView.setVisibility(VISIBLE);
+
+                        View currentMenuView = mContainerView.getChildAt(mCurrentTabPosition);
+                        currentMenuView.setVisibility(GONE);
+
+                        mAdapter.menuClose(mMenuTabLayout.getChildAt(mCurrentTabPosition));
+                        mAdapter.menuOpen(mMenuTabLayout.getChildAt(position));
+
+                        mCurrentTabPosition = position;
+                    } else {
+                        closeMenu();
+                    }
                 }
             }
         });
@@ -146,7 +165,7 @@ public class DownMenuLayout extends LinearLayout {
     /**
      * 关闭菜单
      */
-    private  void closeMenu() {
+    private void closeMenu() {
         if (mAnimatorExecute) return;
         ObjectAnimator translationAnimator = ObjectAnimator.ofFloat(mContainerView,
                 "translationY", 0, -mMenuContainerHeight);
@@ -170,6 +189,7 @@ public class DownMenuLayout extends LinearLayout {
             @Override
             public void onAnimationStart(Animator animation) {
                 mAnimatorExecute = true;
+                mAdapter.menuClose(mMenuTabLayout.getChildAt(mCurrentTabPosition));
             }
         });
         alphaAnimator.start();
@@ -181,7 +201,7 @@ public class DownMenuLayout extends LinearLayout {
      * @param position
      * @param tabView
      */
-    private  void openMenu(final int position, View tabView) {
+    private void openMenu(final int position, View tabView) {
         if (mAnimatorExecute) return;
         mShadowView.setVisibility(VISIBLE);
         View menuView = mContainerView.getChildAt(position);
@@ -207,6 +227,7 @@ public class DownMenuLayout extends LinearLayout {
             @Override
             public void onAnimationStart(Animator animation) {
                 mAnimatorExecute = true;
+                mAdapter.menuOpen(mMenuTabLayout.getChildAt(position));
             }
         });
         alphaAnimator.start();
